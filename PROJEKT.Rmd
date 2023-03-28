@@ -1,0 +1,394 @@
+---
+title: "Analiza czynników wpływających na pogłębiający się kryzys klimatyczny na świecie"
+author: "Emilia Sroka"
+date: "2022-11-27"
+output: html_document
+---
+
+```{r setup, include=F}
+knitr::opts_chunk$set(warning = F, message = F, echo = T)
+```
+
+
+```{r include = F}
+library(dplyr)
+library(tidyr)
+library(gapminder)
+library(countrycode)
+library(CGPfunctions)
+library(RColorBrewer)
+library(jcolors)
+library(ggplot2)
+```
+
+
+
+```{r include = F}
+plastik <- read.csv("C:/Users/emili/Desktop/studia 21/3 sem/Wstęp do analizy danych/Dane do projektu/compt_plastic_wst.csv")
+plastik_waskie <- gather(plastik, year, plastik_val, -country)
+plastik1 <- plastik_waskie %>%
+  filter(year %in% c("X1990","X1993","X1996","X1999","X2002","X2005","X2008","X2011","X2014","X2017")) %>%
+  group_by(year)
+
+plastik1 <- separate(plastik_waskie, col = year, into = c("pusta","year"), sep = "X") 
+
+
+wegiel <- read.csv("C:/Users/emili/Desktop/studia 21/3 sem/Wstęp do analizy danych/Dane do projektu/coal_consumption_total.csv")
+wegiel_waskie <- gather(wegiel, year, wegiel_val, -country)
+wegiel1 <- wegiel_waskie %>%
+  filter(year %in% c("X1990","X1993","X1996","X1999","X2002","X2005","X2008","X2011","X2014","X2017")) %>%
+  group_by(year)
+
+wegiel1 <- separate(wegiel_waskie, col = year, into = c("pusta","year"), sep = "X") 
+
+
+
+slad_weglowy <- read.csv("C:/Users/emili/Desktop/studia 21/3 sem/Wstęp do analizy danych/Dane do projektu/matfootp.csv")
+slad_weglowy_waskie <- gather(slad_weglowy, year, slad_weglowy_val, -country)
+slad_weglowy1 <- slad_weglowy_waskie %>%
+  filter(year %in% c("X1990","X1993","X1996","X1999","X2002","X2005","X2008","X2011","X2014","X2017")) %>%
+  group_by(year)
+
+slad_weglowy1 <- separate(slad_weglowy_waskie, col = year, into = c("pusta","year"), sep = "X") 
+
+
+energia_wodna <- read.csv("C:/Users/emili/Desktop/studia 21/3 sem/Wstęp do analizy danych/Dane do projektu/hydro_power_generation_total.csv")
+energia_wodna_waskie <- gather(energia_wodna, year, energia_wodna_val, -country)
+energia_wodna1 <- energia_wodna_waskie %>%
+  filter(year %in% c("X1990","X1993","X1996","X1999","X2002","X2005","X2008", "X2011")) %>%
+  group_by(year)
+
+energia_wodna1 <- separate(energia_wodna_waskie, col = year, into = c("pusta","year"), sep = "X") 
+
+
+lasy <- read.csv("C:/Users/emili/Desktop/studia 21/3 sem/Wstęp do analizy danych/Dane do projektu/forest_area_sq_km.csv")
+lasy_waskie <- gather(lasy, year, lasy_val, -country)
+lasy1 <- lasy_waskie %>%
+  filter(year %in% c("X1990","X1993","X1996","X1999","X2002","X2005","X2008","X2011","X2014","X2017")) %>%
+  group_by(year)
+
+lasy1 <- separate(lasy_waskie, col = year, into = c("pusta","year"), sep = "X")
+
+
+energia_atomowa <- read.csv("C:/Users/emili/Desktop/studia 21/3 sem/Wstęp do analizy danych/Dane do projektu/nuclear_power_generation_total.csv")
+energia_atomowa_waskie <- gather(energia_atomowa, year, energia_atomowa_val, -country)
+energia_atomowa1 <- lasy_waskie %>%
+  filter(year %in% c("X1990","X1993","X1996","X1999","X2002","X2005","X2008","X2011")) %>%
+  group_by(year)
+
+energia_atomowa1 <- separate(energia_atomowa_waskie, col = year, into = c("pusta","year"), sep = "X")
+
+
+siarka <- read.csv("C:/Users/emili/Desktop/studia 21/3 sem/Wstęp do analizy danych/Dane do projektu/total_sulfur_emission_kilotonnes.csv")
+siarka_waskie <- gather(siarka, year, siarka_val, -country)
+siarka1 <- siarka_waskie %>%
+  filter(year %in% c("X1990","X1993","X1996","X1999","X2000")) %>%
+  group_by(year)
+
+siarka1 <- separate(siarka_waskie, col = year, into = c("pusta","year"), sep = "X")
+
+
+co2 <- read.csv("C:/Users/emili/Desktop/studia 21/3 sem/Wstęp do analizy danych/Dane do projektu/yearly_co2_emissions_1000_tonnes.csv")
+co2_waskie <- gather(co2, year, co2_val, -country)
+co21 <- co2_waskie %>%
+  filter(year %in% c("X1990","X1993","X1996","X1999","X2002","X2005","X2008","X2011","X2014","X2017")) %>%
+  group_by(year)
+
+co21 <- separate(co2_waskie, col = year, into = c("pusta","year"), sep = "X")
+
+hdi <- read.csv("C:/Users/emili/Desktop/studia 21/3 sem/Wstęp do analizy danych/Dane do projektu/hdi_human_development_index.csv")
+hdi_waskie <- gather(hdi, year, hdi_val, -country)
+hdi1 <- hdi_waskie %>%
+  filter(year %in% c("X1990","X1993","X1996","X1999","X2002","X2005","X2008","X2011","X2014","X2017")) %>%
+  group_by(year)
+
+hdi1 <- separate(hdi_waskie, col = year, into = c("pusta","year"), sep = "X")
+
+
+internet <- read.csv("C:/Users/emili/Desktop/studia 21/3 sem/Wstęp do analizy danych/Dane do projektu/net_users_num.csv")
+internet_waskie <- gather(internet, year, internet_val, -country)
+internet1 <- internet_waskie %>%
+  filter(year %in% c("X1990","X1993","X1996","X1999","X2002","X2005","X2008","X2011","X2014","X2017")) %>%
+  group_by(year)
+
+internet1 <- separate(internet_waskie, col = year, into = c("pusta","year"), sep = "X")
+
+```
+
+
+
+```{r include = F}
+ramka1 <- left_join(plastik1[-2], wegiel1[-2], by = c("country", "year"))
+ramka2 <- left_join(ramka1, slad_weglowy1[-2], by = c("country", "year")) 
+ramka3 <- left_join(ramka2, energia_wodna1[-2], by = c("country", "year")) 
+ramka4 <- left_join(ramka3, lasy1[-2], by = c("country", "year")) 
+ramka5 <- left_join(ramka4, energia_atomowa1[-2], by = c("country", "year")) 
+ramka6 <- left_join(ramka5, siarka1[-2], by = c("country", "year"))
+ramka7 <- left_join(ramka6, hdi1[-2], by = c("country", "year")) 
+ramka8 <- left_join(ramka7, internet1[-2], by = c("country", "year")) 
+razem <- left_join(ramka8, co21[-2], by = c("country", "year"))  
+```
+
+
+
+```{r include = F}
+razem$continent <- countrycode(sourcevar = razem[[1]],
+                              origin = "country.name",
+                              destination = "continent",
+                              nomatch = NA)
+```
+
+```{r include = F}
+razem <- razem %>% 
+  mutate(
+    wegiel_val = case_when(
+      grepl("k",wegiel_val) ~ as.numeric(substring(wegiel_val,1,nchar(wegiel_val)-1))*1000,
+      TRUE ~ as.numeric(wegiel_val)),
+    plastik_val = case_when(
+      grepl("k",plastik_val) ~ as.numeric(substring(plastik_val,1,nchar(plastik_val)-1))*1000,
+      TRUE ~ as.numeric(plastik_val)),
+    slad_weglowy_val = case_when(
+      grepl("k",slad_weglowy_val) ~ as.numeric(substring(slad_weglowy_val,1,nchar(slad_weglowy_val)-1))*1000,
+      TRUE ~ as.numeric(slad_weglowy_val)),
+    co2_val = case_when(
+      grepl("k",co2_val) ~ as.numeric(substring(co2_val,1,nchar(co2_val)-1))*1000,
+      TRUE ~ as.numeric(co2_val)),
+    siarka_val = case_when(
+      grepl("k",siarka_val) ~ as.numeric(substring(siarka_val,1,nchar(siarka_val)-1))*1000,
+      TRUE ~ as.numeric(siarka_val)),
+    energia_wodna_val = case_when(
+      grepl("k",energia_wodna_val) ~ as.numeric(substring(energia_wodna_val,1,nchar(energia_wodna_val)-1))*1000,
+      TRUE ~ as.numeric(energia_wodna_val)),
+    energia_atomowa_val = case_when(
+      grepl("k",energia_atomowa_val) ~ as.numeric(substring(energia_atomowa_val,1,nchar(energia_atomowa_val)-1))*1000,
+      TRUE ~ as.numeric(energia_atomowa_val)),
+    lasy_val = case_when(
+      grepl("k",lasy_val) ~ as.numeric(substring(lasy_val,1,nchar(lasy_val)-1))*1000,
+      TRUE ~ as.numeric(lasy_val)),
+    hdi_val = case_when(
+      grepl("k",hdi_val) ~ as.numeric(substring(hdi_val,1,nchar(hdi_val)-1))*1000,
+      TRUE ~ as.numeric(hdi_val)),
+    internet_val = case_when(
+      grepl("k",internet_val) ~ as.numeric(substring(internet_val,1,nchar(internet_val)-1))*1000,
+      TRUE ~ as.numeric(internet_val)),
+    
+    wegiel_val = case_when(
+      grepl("M",wegiel_val) ~ as.numeric(substring(wegiel_val,1,nchar(wegiel_val)-1))*1000000,
+      TRUE ~ as.numeric(wegiel_val)),
+    plastik_val = case_when(
+      grepl("M",plastik_val) ~ as.numeric(substring(plastik_val,1,nchar(plastik_val)-1))*1000000,
+      TRUE ~ as.numeric(plastik_val)),
+    slad_weglowy_val = case_when(
+      grepl("M",slad_weglowy_val) ~ as.numeric(substring(slad_weglowy_val,1,nchar(slad_weglowy_val)-1))*1000000,
+      TRUE ~ as.numeric(slad_weglowy_val)),
+    co2_val = case_when(
+      grepl("M",co2_val) ~ as.numeric(substring(co2_val,1,nchar(co2_val)-1))*1000000,
+      TRUE ~ as.numeric(co2_val)),
+    siarka_val = case_when(
+      grepl("M",siarka_val) ~ as.numeric(substring(siarka_val,1,nchar(siarka_val)-1))*1000000,
+      TRUE ~ as.numeric(siarka_val)),
+    energia_wodna_val = case_when(
+      grepl("M",energia_wodna_val) ~ as.numeric(substring(energia_wodna_val,1,nchar(energia_wodna_val)-1))*1000000,
+      TRUE ~ as.numeric(energia_wodna_val)),
+    energia_atomowa_val = case_when(
+      grepl("M",energia_atomowa_val) ~ as.numeric(substring(energia_atomowa_val,1,nchar(energia_atomowa_val)-1))*1000000,
+      TRUE ~ as.numeric(energia_atomowa_val)),
+    lasy_val = case_when(
+      grepl("M",lasy_val) ~ as.numeric(substring(lasy_val,1,nchar(lasy_val)-1))*1000000,
+      TRUE ~ as.numeric(lasy_val)),
+    hdi_val = case_when(
+      grepl("M",hdi_val) ~ as.numeric(substring(hdi_val,1,nchar(hdi_val)-1))*1000000,
+      TRUE ~ as.numeric(hdi_val)),
+    internet_val = case_when(
+      grepl("M",internet_val) ~ as.numeric(substring(internet_val,1,nchar(internet_val)-1))*1000000,
+      TRUE ~ as.numeric(internet_val))
+  )
+  
+```
+
+
+
+> Obecny kryzys klimatyczny to ogromne wyzwanie stojące przed społeczeństwem całego świata. Zagraża on przyszłości całej planety. Wzrost średniej globalnej temperatury o ponad 1,5°C oznacza podniesienie poziomu mórz, ekstremalne zjawiska pogodowe, wyginięcie wielu gatunków i zniknięcie naturalnych siedlisk, jak również niedobór żywności i wzrost ubóstwa milionów ludzi na całym świecie.
+
+***
+
+#### 1) Jak zmieniła się ilość wyemitowanego dwutlenku węgla w 2011 roku w porównaniu do 1993 dla kontynentów?
+
+```{r include = T}
+razem %>%
+  filter(year %in% c(1993, 2011), continent!="Oceania") %>%
+  select(country, year, co2_val, continent) %>%
+  spread(year, co2_val) %>%
+  rename(co2_val_1993 = "1993",
+         co2_val_2011 = "2011") %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = co2_val_1993, y = co2_val_2011, col = continent), size = 3.5) +
+  geom_abline(slope = 1, intercept = 0, color = "grey") + 
+  labs(title = "Zmiana wielkości emisji dwutlenku węgla ze spalania paliw kopalnych",
+       x = "emisja dwutlenku węgla w 1993 roku",
+       y = "emisja dwutlenku węgla w 2011 roku",
+       color = "kontynent") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 12), text = element_text(size = 12))
+```
+
+
+##### Wielkość emisji dwutlenku węgla w Krajach Europy maleje na przestrzeni lat. W Amerykach, Afryce i Azji emisja jest większa z roku na rok. 
+
+***
+
+
+#### 2) Jak prezentuje się wielkość wskaźnika HDI na świecie? 
+
+```{r include = T}
+razem %>%
+  filter(year>=1990 & year<=2011, continent!="Oceania") %>%
+  select(country, year, hdi_val, continent) %>%
+  ggplot(aes(x = hdi_val, group = continent, fill = continent)) +  
+  geom_density(size = 0.5, alpha=.85)+
+  labs(title = "Wielkość wskaźnika HDI na świecie",
+       x = "wskaźnik HDI",
+       y = "gęstość",
+       color = "kontynent") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 12), text = element_text(size = 12))
+```
+
+
+##### Widzimy, że kraje Europy mają porównywalnie najwyższy wskaźnik HDI. Oznacza to, że są one najbardziej rozwinięte pod względem społeczno-ekonomicznym. Zaraz po nich plasują się Ameryki, Azja i na końcu Afryka.
+
+***
+
+
+#### 3) Czy wielkość emisji dwutlenku węgla zależy od wysokości wskaźnika HDI?
+
+```{r include = T}
+razem %>%
+  filter(year>=1990 & year<=2011, continent!="Oceania") %>%
+  select(country, co2_val, hdi_val, continent) %>%
+  ggplot(aes(x = co2_val, y = hdi_val, group = continent, col = continent)) + 
+  geom_point(size = 1.5)+ 
+  labs(title = "Wielkość wskaźnika HDI a emisja dwutlenku węgla",
+       x = "emisja dwutlenku węgla",
+       y = "wskaźnik HDI",
+       color = "kontynent") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 12), text = element_text(size = 12))
+```
+
+
+##### Można wywnioskować, że wskaźnik HDI ma wpływ na wielkość emisji dwutlenku węgla. Im wyższy wskaźnik HDI tym większa jest całkowita emisja dwutlenku węgla na danym kontynencie. Kraje Europy emitują najwięcej dwutlenku węgla, ale też są krajami najbardziej rozwiniętymi społeczno-ekonomicznie. Jednocześnie jako jedyne państwa na przestrzeni lat zmniejszyły emisję dwutlenku węgla, co wynika z wykresu nr 1.
+
+***
+
+
+#### 4) Jak wysokość wskaźnika HDI wpływa na ilość wyprodukowanej energii wodnej?
+
+```{r include = T}
+razem %>%
+  filter(year>=1990 & year<=2011, continent!="Oceania") %>%
+  select(country, hdi_val, energia_wodna_val, continent) %>%
+  ggplot(aes(x = energia_wodna_val, y= hdi_val, group = continent, col = continent)) + 
+  geom_point(size = 1.5)+
+  labs(title = "Wskaźnik HDI a ilość wyprodukowanej energii wodnej",
+       x = "ilośc wyprodukowanej energii wodnej",
+       y = "wskaźnik HDI") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 12), text = element_text(size = 12))
+```
+
+##### W krajach afrykańskich ilość wyprodukowanej energii wodnej jest najmniejsza. Są to też kraje o najniższym wskaźniku HDI w porównaniu do innych kontynentów. Kraje wysoko i średnio rozwinięte przeważają w produkcji energii wodnej na świecie.
+
+***
+
+
+#### 5) jakie są róźnice w produkcji energii wodnej na świecie?
+
+```{r include = T}
+razem %>%
+  filter(year>=1990 & year<=2011, continent!="Oceania") %>%
+  select(country, energia_wodna_val, continent) %>%
+  ggplot(aes(x = reorder(continent, -energia_wodna_val), 
+             y = energia_wodna_val)) +
+  geom_col(fill = "lightblue") +
+  labs(title = "Porównanie wielkości produkcji energii wodnej",
+       x = "kontynent",
+       y = "wielkość produkcji energii wodnej",
+       color = "kontynent") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 12), text = element_text(size = 12))
+```
+
+##### Najwięcej energii wodnej produkuje Europa i Azja. Są to obszary średnio lub wysoko rozwinięte, wykazujące dosyć wysoki wskaźnik HDI. 
+
+***
+
+
+#### 6) Jakie są różnice w producji energii atomowej na świecie?
+
+```{r include = T}
+razem %>%
+  filter(year>=1990 & year<=2011, continent!="Oceania") %>%
+  select(country, energia_atomowa_val, continent) %>%
+  ggplot(aes(x = reorder(continent, -energia_atomowa_val), 
+             y = energia_atomowa_val)) +
+  geom_col(fill = "lightgreen") +
+  labs(title = "Porównanie wielkości produkcji energii atomowej",
+       x = "kontynent",
+       y = "wielkość produkcji energii atomowej",
+       color = "kontynent") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 12), text = element_text(size = 12))
+```
+
+##### Najwięcej energii atomowej produkuje się w państwach Europy i Ameryk. Na podstawie tego wykresu i wykresu numer 6 można stwierdzić, że kraje o wysokim wskaniku HDI, szczególnie Europa, inwestują w energię odnawialną, dzięki czemu odciążają klimat. 
+
+***
+
+
+#### 7) Emisja dwutlenku węgla i produkcja energi wodnej w pewnym stopniu zależą od wysokości wskaźnika HDI. Jak zatem zmienia się wielkość wskaźnika w perspektywie czasu i jaki może mieć to wpływ na powyższe zmienne?
+
+```{r include = T}
+razem %>%
+  filter(year %in% c(1993, 2017)) %>%
+  select(country, year, hdi_val, continent) %>%
+  spread(year, hdi_val) %>%
+  rename(hdi_val_1993 = "1993",
+         hdi_val_2017 = "2017") %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = hdi_val_1993, y = hdi_val_2017, col = continent),
+             size = 3.5) +
+  geom_abline(slope = 1, intercept = 0, color = "grey") + 
+  labs(title = "Zmiana wskaźnika HDI",
+       x = "wskaźnik HDI w 1993 roku",
+       y = "wskaźnik HDI węgla w 2017 roku",
+       color = "kontynent") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 12), text = element_text(size = 12))
+```
+
+##### Na przestrzeni lat wskaźnik HDI zwiększa się w krajach każdego kontynentu. Jest to dobra wiadomość dla klimatu, bo na podstawie poprzednich analiz wiem, że państwa o średnim i wysokim HDI zmniejszają emisję dwutlenku węgla ze spalania paliw kopalnych oraz inwestują w energię odnawialną, taką jak energia wodna i atomowa. 
+
+***
+
+
+#### 8) Jaki procent plastiku znajduje się w odpadach komunalnych danego kontynentu? Jak to wygląda na całym świecie?
+
+```{r include = T}
+razem %>%
+  filter(year>=1990 & year<=2011, continent!="Oceania") %>%
+  select(country, year, plastik_val, continent) %>%
+  ggplot() + 
+  geom_boxplot(aes(x = continent, y=plastik_val, group = continent),
+                 size = 0.5)+
+  geom_jitter(aes(x = continent, y=plastik_val, group = continent), color = "red", width = 0.1) +
+  labs(title = "Procent plastiku znajdującego się w odpadach komunalnych",
+       x = "kontynent",
+       y = "plastik [%]") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 12), text = element_text(size = 12))
+```
+
+##### Najwięcej plastiku w porównaniu do innych odpadów jest produkowane w Ameryce później w Europie. Są to kontynenty, w których państwa posiadają średni lub wysoki wskaźnik rozwoju społeczno-ekonomicznego. Produkowany plastik oraz jego nadmierna konsumpcja również jest ogromnym problemem, który przyczynia się do kryzysu klimatycznego i zanieczyszczenia planety. Wskaźnik HDI nie wpływa jednak na procent wyrzucanego plastiku.
+
+
